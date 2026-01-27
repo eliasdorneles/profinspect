@@ -51,6 +51,8 @@ python -m profecy output.pstats
 
 prof, pstats, callgrind, perf, collapse, axe, dtrace, hprof, json, sleepy, sysprof, xperf
 
+The format is auto-detected from the file extension when possible (e.g. `.pstats`, `.prof`, `callgrind.out.*`). If it cannot be inferred, the configured default is used. You can always override the format manually in the dropdown.
+
 These correspond to the formats supported by gprof2dot. Common examples:
 
 | Profiler | Format | Example |
@@ -66,13 +68,16 @@ These correspond to the formats supported by gprof2dot. Common examples:
 The main view has a collapsible sidebar with options and a pannable/zoomable SVG display area.
 
 **Sidebar options:**
-- File path and format selection
+- File picker (browse button) with auto-detected format
+- Format dropdown with auto-detect or manual override
 - Node and edge threshold sliders (prune low-impact nodes/edges)
 - Colormap selection (color, bw, gray, pink, print)
 - Checkboxes: strip C++ names, wrap labels, color by self time, show samples
 - Advanced: root/leaf function filters, max depth, color skew, path filter
 
 **Zoom controls:** buttons for zoom in/out, 1:1 reset, and fit-to-view. Mouse wheel zooms at cursor. Click-drag to pan. `Ctrl+Enter` triggers generation.
+
+**Text selection:** click-drag on text within graph nodes to select and copy function names. Panning is disabled over text elements to allow selection.
 
 ## Settings
 

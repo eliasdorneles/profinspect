@@ -13,20 +13,81 @@
     const edgeThreshold = document.getElementById("edge_threshold");
     const nodeThresholdVal = document.getElementById("node_threshold_val");
     const edgeThresholdVal = document.getElementById("edge_threshold_val");
+    const fileInput = document.getElementById("file_input");
+    const fileBrowseBtn = document.getElementById("file-browse-btn");
+    const fileNameSpan = document.getElementById("file-name");
+    const filePathInput = document.getElementById("file_path");
+    const formatSelect = document.getElementById("format");
+
+    // The File object selected by the user (null when using CLI-provided path)
+    var selectedFile = null;
+
+    // --- Format inference ---
+    var FORMAT_EXTENSIONS = {
+        ".pstats": "pstats",
+        ".prof": "prof",
+        ".hprof": "hprof",
+        ".json": "json",
+        ".collapse": "collapse",
+        ".dtrace": "dtrace",
+        ".perf": "perf",
+        ".callgrind": "callgrind",
+    };
+
+    var FORMAT_PREFIXES = {
+        "callgrind.out": "callgrind",
+    };
+
+    function inferFormat(filename) {
+        var name = filename.toLowerCase();
+        var keys, i;
+        keys = Object.keys(FORMAT_PREFIXES);
+        for (i = 0; i < keys.length; i++) {
+            if (name.startsWith(keys[i])) return FORMAT_PREFIXES[keys[i]];
+        }
+        keys = Object.keys(FORMAT_EXTENSIONS);
+        for (i = 0; i < keys.length; i++) {
+            if (name.endsWith(keys[i])) return FORMAT_EXTENSIONS[keys[i]];
+        }
+        return null;
+    }
+
+    // --- File picker ---
+    fileBrowseBtn.addEventListener("click", function () {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener("change", function () {
+        if (fileInput.files.length > 0) {
+            selectedFile = fileInput.files[0];
+            fileNameSpan.textContent = selectedFile.name;
+            fileNameSpan.title = selectedFile.name;
+            // Clear any CLI-provided path since user chose a new file
+            filePathInput.value = "";
+
+            // Auto-detect format if dropdown is on auto
+            if (formatSelect.value === "auto") {
+                var inferred = inferFormat(selectedFile.name);
+                if (inferred) {
+                    setStatus("Detected format: " + inferred, "success");
+                }
+            }
+        }
+    });
 
     // --- Pan/Zoom state ---
-    let scale = 1;
-    let translateX = 0;
-    let translateY = 0;
-    let isPanning = false;
-    let panStartX = 0;
-    let panStartY = 0;
-    let panStartTranslateX = 0;
-    let panStartTranslateY = 0;
+    var scale = 1;
+    var translateX = 0;
+    var translateY = 0;
+    var isPanning = false;
+    var panStartX = 0;
+    var panStartY = 0;
+    var panStartTranslateX = 0;
+    var panStartTranslateY = 0;
 
-    const MIN_SCALE = 0.05;
-    const MAX_SCALE = 10;
-    const ZOOM_FACTOR = 1.15;
+    var MIN_SCALE = 0.05;
+    var MAX_SCALE = 10;
+    var ZOOM_FACTOR = 1.15;
 
     function applyTransform() {
         svgWrapper.style.transform =
@@ -35,12 +96,12 @@
 
     // --- Zoom controls ---
     document.getElementById("zoom-in").addEventListener("click", function () {
-        const rect = svgContainer.getBoundingClientRect();
+        var rect = svgContainer.getBoundingClientRect();
         zoomAtPoint(rect.width / 2, rect.height / 2, ZOOM_FACTOR);
     });
 
     document.getElementById("zoom-out").addEventListener("click", function () {
-        const rect = svgContainer.getBoundingClientRect();
+        var rect = svgContainer.getBoundingClientRect();
         zoomAtPoint(rect.width / 2, rect.height / 2, 1 / ZOOM_FACTOR);
     });
 
@@ -73,7 +134,7 @@
         if (svgWidth === 0 || svgHeight === 0) return;
         var scaleX = containerRect.width / svgWidth;
         var scaleY = containerRect.height / svgHeight;
-        scale = Math.min(scaleX, scaleY) * 0.95; // 5% margin
+        scale = Math.min(scaleX, scaleY) * 0.95;
         translateX = (containerRect.width - svgWidth * scale) / 2;
         translateY = (containerRect.height - svgHeight * scale) / 2;
         applyTransform();
@@ -90,8 +151,20 @@
     }, { passive: false });
 
     // --- Pan (pointer events) ---
+    // Allow text selection on SVG text elements; pan on everything else.
+    function isTextTarget(el) {
+        while (el && el !== svgContainer) {
+            var tag = el.tagName;
+            if (tag === "text" || tag === "tspan") return true;
+            el = el.parentElement;
+        }
+        return false;
+    }
+
     svgContainer.addEventListener("pointerdown", function (e) {
         if (e.button !== 0) return;
+        // Don't pan when clicking on SVG text — let the browser handle selection
+        if (isTextTarget(e.target)) return;
         isPanning = true;
         panStartX = e.clientX;
         panStartY = e.clientY;
@@ -108,7 +181,7 @@
         applyTransform();
     });
 
-    svgContainer.addEventListener("pointerup", function (e) {
+    svgContainer.addEventListener("pointerup", function () {
         isPanning = false;
         svgContainer.classList.remove("grabbing");
     });
@@ -140,29 +213,39 @@
     }
 
     // --- Generate ---
-    function gatherOptions() {
-        return {
-            file_path: document.getElementById("file_path").value.trim(),
-            format: document.getElementById("format").value,
-            node_threshold: parseFloat(nodeThreshold.value),
-            edge_threshold: parseFloat(edgeThreshold.value),
-            colormap: document.getElementById("colormap").value,
-            strip: document.getElementById("strip").checked,
-            wrap: document.getElementById("wrap").checked,
-            color_nodes_by_selftime: document.getElementById("color_nodes_by_selftime").checked,
-            show_samples: document.getElementById("show_samples").checked,
-            root: document.getElementById("root").value.trim(),
-            leaf: document.getElementById("leaf").value.trim(),
-            depth: document.getElementById("depth").value.trim(),
-            skew: document.getElementById("skew").value.trim(),
-            path: document.getElementById("path_filter").value.trim(),
-        };
+    function hasFile() {
+        return selectedFile || filePathInput.value.trim();
+    }
+
+    function buildFormData() {
+        var fd = new FormData();
+
+        if (selectedFile) {
+            fd.append("file", selectedFile);
+        } else {
+            fd.append("file_path", filePathInput.value.trim());
+        }
+
+        fd.append("format", formatSelect.value);
+        fd.append("node_threshold", nodeThreshold.value);
+        fd.append("edge_threshold", edgeThreshold.value);
+        fd.append("colormap", document.getElementById("colormap").value);
+        fd.append("strip", document.getElementById("strip").checked);
+        fd.append("wrap", document.getElementById("wrap").checked);
+        fd.append("color_nodes_by_selftime", document.getElementById("color_nodes_by_selftime").checked);
+        fd.append("show_samples", document.getElementById("show_samples").checked);
+        fd.append("root", document.getElementById("root").value.trim());
+        fd.append("leaf", document.getElementById("leaf").value.trim());
+        fd.append("depth", document.getElementById("depth").value.trim());
+        fd.append("skew", document.getElementById("skew").value.trim());
+        fd.append("path", document.getElementById("path_filter").value.trim());
+
+        return fd;
     }
 
     async function doGenerate() {
-        var opts = gatherOptions();
-        if (!opts.file_path) {
-            setStatus("Please enter a file path.", "error");
+        if (!hasFile()) {
+            setStatus("Please select a profile file.", "error");
             return;
         }
 
@@ -173,8 +256,7 @@
         try {
             var resp = await fetch("/generate", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(opts),
+                body: buildFormData(),
             });
 
             if (!resp.ok) {
@@ -211,7 +293,6 @@
             }
             var svg = doc.documentElement;
             if (svg && svg.nodeName === "svg") {
-                // Adopt the SVG node into this document so it can be appended
                 svg = document.adoptNode(svg);
                 svgWrapper.appendChild(svg);
                 // Reset transform and fit
@@ -219,7 +300,6 @@
                 translateX = 0;
                 translateY = 0;
                 applyTransform();
-                // Give the browser a tick to layout, then fit
                 requestAnimationFrame(function () {
                     fitToView();
                 });
@@ -237,14 +317,14 @@
 
     generateBtn.addEventListener("click", doGenerate);
 
-    // --- Keyboard shortcut: Enter to generate ---
+    // --- Keyboard shortcut: Ctrl+Enter to generate ---
     document.addEventListener("keydown", function (e) {
         if (e.key === "Enter" && e.ctrlKey) {
             doGenerate();
         }
     });
 
-    // --- Auto-generate if initial file provided ---
+    // --- Auto-generate if initial file provided via CLI ---
     if (window.PROFECY_INITIAL_FILE) {
         doGenerate();
     }

@@ -1,11 +1,13 @@
 """Flask application factory and routes."""
 
 import logging
+import os
+import tempfile
 
 from flask import Flask, jsonify, render_template, request
 
 from .config import get_defaults, load_settings, save_settings
-from .converter import generate_svg
+from .converter import generate_svg, infer_format
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +39,10 @@ def create_app(initial_file: str | None = None) -> Flask:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     )
 
+    @app.template_filter("basename")
+    def basename_filter(path):
+        return os.path.basename(path) if path else ""
+
     @app.route("/")
     def index():
         defaults = get_defaults()
@@ -50,19 +56,45 @@ def create_app(initial_file: str | None = None) -> Flask:
 
     @app.route("/generate", methods=["POST"])
     def generate():
-        data = request.get_json()
-        if not data or not data.get("file_path"):
-            return jsonify({"svg": "", "error": "No file path provided."}), 400
+        # Support both FormData (file upload) and JSON (file_path)
+        uploaded_file = request.files.get("file")
+        file_path = request.form.get("file_path", "") if uploaded_file or request.form else (request.get_json() or {}).get("file_path", "")
+
+        if not uploaded_file and not file_path:
+            return jsonify({"svg": "", "error": "No file provided."}), 400
+
+        # Read options from form fields or JSON
+        if request.form:
+            data = request.form
+        else:
+            data = request.get_json() or {}
+
+        def _bool(val):
+            if isinstance(val, bool):
+                return val
+            return val in ("true", "True", "1", "on")
+
+        filename = uploaded_file.filename if uploaded_file else os.path.basename(file_path)
+        fmt = data.get("format", "auto")
+        if fmt == "auto":
+            inferred = infer_format(filename)
+            if inferred:
+                fmt = inferred
+                logger.info("Auto-detected format '%s' for %s", fmt, filename)
+            else:
+                settings = load_settings()
+                fmt = settings["defaults"].get("format", "prof")
+                logger.info("Could not infer format for %s, falling back to '%s'", filename, fmt)
 
         options = {
-            "format": data.get("format", "prof"),
-            "node_threshold": data.get("node_threshold", 0.5),
-            "edge_threshold": data.get("edge_threshold", 0.1),
+            "format": fmt,
+            "node_threshold": float(data.get("node_threshold", 0.5)),
+            "edge_threshold": float(data.get("edge_threshold", 0.1)),
             "colormap": data.get("colormap", "color"),
-            "strip": data.get("strip", False),
-            "wrap": data.get("wrap", False),
-            "color_nodes_by_selftime": data.get("color_nodes_by_selftime", False),
-            "show_samples": data.get("show_samples", False),
+            "strip": _bool(data.get("strip", False)),
+            "wrap": _bool(data.get("wrap", False)),
+            "color_nodes_by_selftime": _bool(data.get("color_nodes_by_selftime", False)),
+            "show_samples": _bool(data.get("show_samples", False)),
             "root": data.get("root", ""),
             "leaf": data.get("leaf", ""),
             "depth": data.get("depth", ""),
@@ -71,13 +103,29 @@ def create_app(initial_file: str | None = None) -> Flask:
         }
 
         settings = load_settings()
-        svg, error = generate_svg(data["file_path"], options, settings)
+        tmp_path = None
+        try:
+            if uploaded_file:
+                # Save uploaded file to a temp location
+                suffix = os.path.splitext(filename)[1] or ""
+                fd, tmp_path = tempfile.mkstemp(suffix=suffix, prefix="profecy_")
+                os.close(fd)
+                uploaded_file.save(tmp_path)
+                target_path = tmp_path
+                logger.info("Saved uploaded file %s to %s", filename, tmp_path)
+            else:
+                target_path = file_path
+
+            svg, error = generate_svg(target_path, options, settings)
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                os.unlink(tmp_path)
 
         if error:
-            logger.error("Generate failed for %s: %s", data["file_path"], error)
+            logger.error("Generate failed for %s: %s", filename, error)
             return jsonify({"svg": "", "error": error}), 422
 
-        logger.info("Generated SVG for %s", data["file_path"])
+        logger.info("Generated SVG for %s", filename)
         return jsonify({"svg": svg, "error": ""})
 
     @app.route("/settings")

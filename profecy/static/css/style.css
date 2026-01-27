@@ -162,6 +162,31 @@ main {
     margin-bottom: 0.25rem;
 }
 
+/* File picker */
+.file-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.file-browse-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.file-name {
+    font-size: 0.8rem;
+    color: var(--pico-muted-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
 .generate-btn {
     width: 100%;
     margin-top: 0.75rem;
@@ -226,6 +251,13 @@ main {
 
 .svg-wrapper svg {
     display: block;
+}
+
+/* Allow text selection inside SVG graph nodes */
+.svg-wrapper svg text {
+    cursor: text;
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 .placeholder {

@@ -11,6 +11,36 @@ logger = logging.getLogger(__name__)
 
 TIMEOUT_SECONDS = 60
 
+FORMAT_EXTENSIONS = {
+    ".pstats": "pstats",
+    ".prof": "prof",
+    ".hprof": "hprof",
+    ".json": "json",
+    ".collapse": "collapse",
+    ".dtrace": "dtrace",
+    ".perf": "perf",
+    ".callgrind": "callgrind",
+}
+
+FORMAT_PREFIXES = {
+    "callgrind.out": "callgrind",
+}
+
+
+def infer_format(filename: str) -> str | None:
+    """Infer gprof2dot profile format from a filename.
+
+    Returns the format string, or None if it cannot be determined.
+    """
+    name = Path(filename).name.lower()
+    for prefix, fmt in FORMAT_PREFIXES.items():
+        if name.startswith(prefix):
+            return fmt
+    for ext, fmt in FORMAT_EXTENSIONS.items():
+        if name.endswith(ext):
+            return fmt
+    return None
+
 
 def generate_svg(file_path: str, options: dict, settings: dict | None = None) -> tuple[str, str]:
     """Run gprof2dot piped into dot to produce SVG.

@@ -8,13 +8,19 @@
         <div class="sidebar-content">
             <h3>Options</h3>
 
-            <label for="file_path">File path</label>
-            <input type="text" id="file_path" name="file_path" value="{{ initial_file }}" placeholder="/path/to/profile.pstats">
+            <label>Profile file</label>
+            <div class="file-picker">
+                <button type="button" id="file-browse-btn" class="file-browse-btn">Browse&hellip;</button>
+                <span class="file-name" id="file-name">{% if initial_file %}{{ initial_file | basename }}{% else %}No file selected{% endif %}</span>
+                <input type="file" id="file_input" hidden>
+                <input type="hidden" id="file_path" value="{{ initial_file }}">
+            </div>
 
             <label for="format">Format</label>
             <select id="format" name="format">
+                <option value="auto" selected>(auto-detect)</option>
                 {% for fmt in formats %}
-                <option value="{{ fmt }}" {% if fmt == defaults.format %}selected{% endif %}>{{ fmt }}</option>
+                <option value="{{ fmt }}">{{ fmt }}</option>
                 {% endfor %}
             </select>
 
@@ -70,7 +76,7 @@
         <div class="svg-container" id="svg-container">
             <div class="svg-wrapper" id="svg-wrapper">
                 <div class="placeholder" id="placeholder">
-                    <p>Load a profile file and click <strong>Generate</strong> to visualize.</p>
+                    <p>Select a profile file and click <strong>Generate</strong> to visualize.</p>
                 </div>
             </div>
         </div>
