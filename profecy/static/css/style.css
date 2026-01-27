@@ -69,7 +69,8 @@ main {
 .sidebar.collapsed {
     width: 0;
     min-width: 0;
-    overflow: hidden;
+    border-right: none;
+    overflow: visible;
 }
 
 .sidebar.collapsed .sidebar-content {
@@ -78,10 +79,10 @@ main {
 
 .sidebar-toggle {
     position: absolute;
-    right: -24px;
+    right: -28px;
     top: 8px;
-    width: 24px;
-    height: 32px;
+    width: 28px;
+    height: 36px;
     padding: 0;
     margin: 0;
     border: 1px solid var(--pico-muted-border-color);
@@ -90,12 +91,14 @@ main {
     cursor: pointer;
     z-index: 10;
     border-radius: 0 4px 4px 0;
-    font-size: 14px;
-    line-height: 32px;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 36px;
+    color: var(--pico-primary);
 }
 
-.sidebar.collapsed .sidebar-toggle {
-    right: -24px;
+.sidebar-toggle:hover {
+    background: var(--pico-secondary-background);
 }
 
 .sidebar-content {
