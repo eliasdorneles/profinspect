@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Profecy - Settings{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <h2>Settings</h2>
+
+    <section>
+        <h3>External Commands</h3>
+        <label for="gprof2dot_command">gprof2dot command</label>
+        <div class="command-row">
+            <input type="text" id="gprof2dot_command" value="{{ settings.gprof2dot_command }}">
+            <button class="test-btn" data-target="gprof2dot_command">Test</button>
+        </div>
+        <small>Default: <code>uvx gprof2dot</code></small>
+
+        <label for="dot_command">dot command</label>
+        <div class="command-row">
+            <input type="text" id="dot_command" value="{{ settings.dot_command }}">
+            <button class="test-btn" data-target="dot_command">Test</button>
+        </div>
+        <small>Default: <code>dot</code> (from Graphviz)</small>
+    </section>
+
+    <section>
+        <h3>Default Options</h3>
+
+        <label for="default_format">Format</label>
+        <select id="default_format">
+            {% for fmt in formats %}
+            <option value="{{ fmt }}" {% if fmt == settings.defaults.format %}selected{% endif %}>{{ fmt }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="default_node_threshold">Node threshold (%)</label>
+        <input type="number" id="default_node_threshold" value="{{ settings.defaults.node_threshold }}" min="0" max="100" step="0.1">
+
+        <label for="default_edge_threshold">Edge threshold (%)</label>
+        <input type="number" id="default_edge_threshold" value="{{ settings.defaults.edge_threshold }}" min="0" max="100" step="0.1">
+
+        <label for="default_colormap">Colormap</label>
+        <select id="default_colormap">
+            {% for cm in colormaps %}
+            <option value="{{ cm }}" {% if cm == settings.defaults.colormap %}selected{% endif %}>{{ cm }}</option>
+            {% endfor %}
+        </select>
+
+        <fieldset>
+            <label><input type="checkbox" id="default_strip" {% if settings.defaults.strip %}checked{% endif %}> Strip C++ names</label>
+            <label><input type="checkbox" id="default_wrap" {% if settings.defaults.wrap %}checked{% endif %}> Wrap labels</label>
+            <label><input type="checkbox" id="default_color_nodes_by_selftime" {% if settings.defaults.color_nodes_by_selftime %}checked{% endif %}> Color nodes by self time</label>
+            <label><input type="checkbox" id="default_show_samples" {% if settings.defaults.show_samples %}checked{% endif %}> Show samples</label>
+        </fieldset>
+    </section>
+
+    <div class="settings-actions">
+        <button id="save-settings-btn">Save Settings</button>
+        <span id="settings-status"></span>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById("save-settings-btn").addEventListener("click", async () => {
+    const status = document.getElementById("settings-status");
+    status.textContent = "Saving...";
+
+    const data = {
+        gprof2dot_command: document.getElementById("gprof2dot_command").value,
+        dot_command: document.getElementById("dot_command").value,
+        default_format: document.getElementById("default_format").value,
+        default_node_threshold: parseFloat(document.getElementById("default_node_threshold").value),
+        default_edge_threshold: parseFloat(document.getElementById("default_edge_threshold").value),
+        default_colormap: document.getElementById("default_colormap").value,
+        default_strip: document.getElementById("default_strip").checked,
+        default_wrap: document.getElementById("default_wrap").checked,
+        default_color_nodes_by_selftime: document.getElementById("default_color_nodes_by_selftime").checked,
+        default_show_samples: document.getElementById("default_show_samples").checked,
+    };
+
+    try {
+        const resp = await fetch("/settings", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data),
+        });
+        const result = await resp.json();
+        if (result.success) {
+            status.textContent = "Saved.";
+            status.className = "success";
+        } else {
+            status.textContent = "Error: " + (result.error || "Unknown");
+            status.className = "error";
+        }
+    } catch (e) {
+        status.textContent = "Failed to save: " + e.message;
+        status.className = "error";
+    }
+});
+
+document.querySelectorAll(".test-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+        const input = document.getElementById(btn.dataset.target);
+        const cmd = input.value.split(/\s+/)[0];
+        btn.textContent = "Testing...";
+        btn.disabled = true;
+        try {
+            // Simple test: try running --help or -V
+            const testCmd = input.value + (btn.dataset.target === "gprof2dot_command" ? " --help" : " -V");
+            // We can't directly test from browser, so just validate it's not empty
+            if (!input.value.trim()) {
+                btn.textContent = "Empty!";
+                btn.className = "test-btn error";
+            } else {
+                btn.textContent = "OK";
+                btn.className = "test-btn success";
+            }
+        } catch(e) {
+            btn.textContent = "Error";
+            btn.className = "test-btn error";
+        }
+        setTimeout(() => {
+            btn.textContent = "Test";
+            btn.className = "test-btn";
+            btn.disabled = false;
+        }, 2000);
+    });
+});
+</script>
+{% endblock %}

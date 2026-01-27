@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Profecy - Visualize{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">&lsaquo;</button>
+        <div class="sidebar-content">
+            <h3>Options</h3>
+
+            <label for="file_path">File path</label>
+            <input type="text" id="file_path" name="file_path" value="{{ initial_file }}" placeholder="/path/to/profile.pstats">
+
+            <label for="format">Format</label>
+            <select id="format" name="format">
+                {% for fmt in formats %}
+                <option value="{{ fmt }}" {% if fmt == defaults.format %}selected{% endif %}>{{ fmt }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="node_threshold">Node threshold: <span id="node_threshold_val">{{ defaults.node_threshold }}%</span></label>
+            <input type="range" id="node_threshold" name="node_threshold" min="0" max="100" step="0.1" value="{{ defaults.node_threshold }}">
+
+            <label for="edge_threshold">Edge threshold: <span id="edge_threshold_val">{{ defaults.edge_threshold }}%</span></label>
+            <input type="range" id="edge_threshold" name="edge_threshold" min="0" max="100" step="0.1" value="{{ defaults.edge_threshold }}">
+
+            <label for="colormap">Colormap</label>
+            <select id="colormap" name="colormap">
+                {% for cm in colormaps %}
+                <option value="{{ cm }}" {% if cm == defaults.colormap %}selected{% endif %}>{{ cm }}</option>
+                {% endfor %}
+            </select>
+
+            <fieldset>
+                <label><input type="checkbox" id="strip" name="strip" {% if defaults.strip %}checked{% endif %}> Strip C++ names</label>
+                <label><input type="checkbox" id="wrap" name="wrap" {% if defaults.wrap %}checked{% endif %}> Wrap labels</label>
+                <label><input type="checkbox" id="color_nodes_by_selftime" name="color_nodes_by_selftime" {% if defaults.color_nodes_by_selftime %}checked{% endif %}> Color by self time</label>
+                <label><input type="checkbox" id="show_samples" name="show_samples" {% if defaults.show_samples %}checked{% endif %}> Show samples</label>
+            </fieldset>
+
+            <details class="advanced-options">
+                <summary>Advanced</summary>
+                <label for="root">Root function</label>
+                <input type="text" id="root" name="root" placeholder="function name">
+
+                <label for="leaf">Leaf function</label>
+                <input type="text" id="leaf" name="leaf" placeholder="function name">
+
+                <label for="depth">Max depth</label>
+                <input type="number" id="depth" name="depth" placeholder="e.g. 5" min="1">
+
+                <label for="skew">Color skew</label>
+                <input type="number" id="skew" name="skew" placeholder="e.g. 0.5" step="0.1" min="0.1">
+
+                <label for="path_filter">Path filter</label>
+                <input type="text" id="path_filter" name="path_filter" placeholder="/src/mymodule">
+            </details>
+
+            <button id="generate-btn" class="generate-btn">Generate</button>
+        </div>
+    </aside>
+
+    <section class="main-area">
+        <div class="zoom-controls">
+            <button id="zoom-in" title="Zoom in">+</button>
+            <button id="zoom-out" title="Zoom out">&minus;</button>
+            <button id="zoom-reset" title="Reset zoom">1:1</button>
+            <button id="zoom-fit" title="Fit to view">Fit</button>
+        </div>
+        <div class="svg-container" id="svg-container">
+            <div class="svg-wrapper" id="svg-wrapper">
+                <div class="placeholder" id="placeholder">
+                    <p>Load a profile file and click <strong>Generate</strong> to visualize.</p>
+                </div>
+            </div>
+        </div>
+        <div class="status-bar" id="status-bar">Ready</div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.PROFECY_INITIAL_FILE = {{ initial_file | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

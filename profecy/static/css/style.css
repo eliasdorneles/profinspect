@@ -1,0 +1,364 @@
+/* Reset Pico's container width for our full-bleed layout */
+:root {
+    --pico-font-size: 14px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Top navigation */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 1rem;
+    background: var(--pico-card-background-color);
+    border-bottom: 1px solid var(--pico-muted-border-color);
+    margin: 0;
+}
+
+.top-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+}
+
+.top-nav a {
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.top-nav a.active {
+    background: var(--pico-primary-background);
+    color: var(--pico-primary-inverse);
+}
+
+/* Main layout */
+main {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.app-layout {
+    display: flex;
+    height: calc(100vh - 45px);
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    position: relative;
+    width: 280px;
+    min-width: 280px;
+    border-right: 1px solid var(--pico-muted-border-color);
+    background: var(--pico-card-background-color);
+    display: flex;
+    flex-direction: column;
+    transition: min-width 0.2s, width 0.2s;
+}
+
+.sidebar.collapsed {
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.sidebar.collapsed .sidebar-content {
+    display: none;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    right: -24px;
+    top: 8px;
+    width: 24px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--pico-muted-border-color);
+    border-left: none;
+    background: var(--pico-card-background-color);
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+    line-height: 32px;
+}
+
+.sidebar.collapsed .sidebar-toggle {
+    right: -24px;
+}
+
+.sidebar-content {
+    padding: 0.75rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.sidebar-content h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.sidebar-content label {
+    display: block;
+    margin-bottom: 0.15rem;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.sidebar-content input[type="text"],
+.sidebar-content input[type="number"],
+.sidebar-content select {
+    margin-bottom: 0;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.85rem;
+    height: auto;
+}
+
+.sidebar-content input[type="range"] {
+    margin-bottom: 0;
+    padding: 0;
+}
+
+.sidebar-content fieldset {
+    border: none;
+    padding: 0;
+    margin: 0.5rem 0;
+}
+
+.sidebar-content fieldset label {
+    margin-top: 0.15rem;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.sidebar-content fieldset input[type="checkbox"] {
+    margin: 0;
+}
+
+.sidebar-content details {
+    margin-top: 0.5rem;
+    border: none;
+}
+
+.sidebar-content details summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.generate-btn {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+/* Main SVG area */
+.main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.zoom-controls {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    display: flex;
+    gap: 4px;
+}
+
+.zoom-controls button {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+    line-height: 36px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid var(--pico-muted-border-color);
+    background: var(--pico-card-background-color);
+    border-radius: 4px;
+}
+
+.zoom-controls button:hover {
+    background: var(--pico-secondary-background);
+}
+
+.svg-container {
+    flex: 1;
+    overflow: hidden;
+    cursor: grab;
+    background:
+        radial-gradient(circle, var(--pico-muted-border-color) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.svg-container.grabbing {
+    cursor: grabbing;
+}
+
+.svg-wrapper {
+    transform-origin: 0 0;
+    width: fit-content;
+    height: fit-content;
+}
+
+.svg-wrapper svg {
+    display: block;
+}
+
+.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    color: var(--pico-muted-color);
+    text-align: center;
+}
+
+.status-bar {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    border-top: 1px solid var(--pico-muted-border-color);
+    background: var(--pico-card-background-color);
+    color: var(--pico-muted-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-bar.error {
+    color: var(--pico-del-color, #c62828);
+}
+
+.status-bar.success {
+    color: var(--pico-ins-color, #2e7d32);
+}
+
+/* Settings page */
+.settings-page {
+    max-width: 640px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+}
+
+.settings-page h2 {
+    margin-bottom: 1rem;
+}
+
+.settings-page h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.settings-page section {
+    margin-bottom: 1rem;
+}
+
+.settings-page label {
+    display: block;
+    margin-top: 0.75rem;
+    margin-bottom: 0.15rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.settings-page fieldset {
+    border: none;
+    padding: 0;
+    margin: 0.5rem 0;
+}
+
+.settings-page fieldset label {
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.settings-page fieldset input[type="checkbox"] {
+    margin: 0;
+}
+
+.command-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.command-row input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.test-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.test-btn.success {
+    color: var(--pico-ins-color, #2e7d32);
+}
+
+.test-btn.error {
+    color: var(--pico-del-color, #c62828);
+}
+
+.settings-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#settings-status {
+    font-size: 0.85rem;
+}
+
+#settings-status.success {
+    color: var(--pico-ins-color, #2e7d32);
+}
+
+#settings-status.error {
+    color: var(--pico-del-color, #c62828);
+}
+
+/* Responsive: collapse sidebar on narrow screens */
+@media (max-width: 640px) {
+    .sidebar {
+        width: 0;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .sidebar:not(.collapsed) {
+        position: absolute;
+        z-index: 20;
+        height: calc(100vh - 45px);
+        width: 280px;
+        min-width: 280px;
+    }
+}
