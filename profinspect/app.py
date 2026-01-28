@@ -82,8 +82,7 @@ def create_app(initial_file: str | None = None) -> Flask:
                 fmt = inferred
                 logger.info("Auto-detected format '%s' for %s", fmt, filename)
             else:
-                settings = load_settings()
-                fmt = settings["defaults"].get("format", "prof")
+                fmt = "prof"
                 logger.info("Could not infer format for %s, falling back to '%s'", filename, fmt)
 
         options = {
@@ -140,10 +139,9 @@ def create_app(initial_file: str | None = None) -> Flask:
             return jsonify({"error": "No data provided."}), 400
 
         new_settings = {
-            "gprof2dot_command": data.get("gprof2dot_command", "uvx gprof2dot"),
+            "gprof2dot_command": data.get("gprof2dot_command", "gprof2dot"),
             "dot_command": data.get("dot_command", "dot"),
             "defaults": {
-                "format": data.get("default_format", "prof"),
                 "node_threshold": float(data.get("default_node_threshold", 0.5)),
                 "edge_threshold": float(data.get("default_edge_threshold", 0.1)),
                 "colormap": data.get("default_colormap", "color"),

@@ -7,10 +7,9 @@ CONFIG_DIR = Path.home() / ".config" / "profinspect"
 CONFIG_FILE = CONFIG_DIR / "settings.json"
 
 DEFAULT_SETTINGS = {
-    "gprof2dot_command": "uvx gprof2dot",
+    "gprof2dot_command": "gprof2dot",
     "dot_command": "dot",
     "defaults": {
-        "format": "prof",
         "node_threshold": 0.5,
         "edge_threshold": 0.1,
         "colormap": "color",

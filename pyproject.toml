@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "flask>=3.0",
+    "gprof2dot>=2022.7.29",
 ]
 
 [project.scripts]
