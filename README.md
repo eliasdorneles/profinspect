@@ -10,14 +10,16 @@ A local web app for visualizing profiling data. Wraps [gprof2dot](https://github
 
 ## Installation
 
+Install from PyPI:
+
 ```
-pip install -e .
+pip install profinspect
 ```
 
 Or with [uv](https://docs.astral.sh/uv/):
 
 ```
-uv sync
+uv pip install profinspect
 ```
 
 ## Usage
