@@ -23,20 +23,20 @@ uv sync
 ## Usage
 
 ```
-profecy [file] [--port PORT] [--no-browser]
+profinspect [file] [--port PORT] [--no-browser]
 ```
 
 Run with no arguments to open the UI with an empty file input:
 
 ```
-profecy
+profinspect
 ```
 
 Pass a profile file to open the UI and immediately render the graph:
 
 ```
-profecy output.pstats
-profecy --port 8080 callgrind.out
+profinspect output.pstats
+profinspect --port 8080 callgrind.out
 ```
 
 The `--no-browser` flag starts the server without opening a browser window.
@@ -44,7 +44,7 @@ The `--no-browser` flag starts the server without opening a browser window.
 You can also run as a module:
 
 ```
-python -m profecy output.pstats
+python -m profinspect output.pstats
 ```
 
 ## Supported Profile Formats
@@ -81,7 +81,7 @@ The main view has a collapsible sidebar with options and a pannable/zoomable SVG
 
 ## Settings
 
-Accessible from the Settings tab in the UI. Persisted to `~/.config/profecy/settings.json`.
+Accessible from the Settings tab in the UI. Persisted to `~/.config/profinspect/settings.json`.
 
 Configurable values:
 - `gprof2dot_command` -- command to run gprof2dot (default: `uvx gprof2dot`)

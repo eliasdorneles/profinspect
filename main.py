@@ -1,6 +1,6 @@
-"""Legacy entry point — delegates to profecy.cli.main."""
+"""Legacy entry point — delegates to profinspect.cli.main."""
 
-from profecy.cli import main
+from profinspect.cli import main
 
 if __name__ == "__main__":
     main()

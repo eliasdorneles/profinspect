@@ -1,5 +1,5 @@
-"""Allow running with `python -m profecy`."""
+"""Allow running with `python -m profinspect`."""
 
-from profecy.cli import main
+from profinspect.cli import main
 
 main()

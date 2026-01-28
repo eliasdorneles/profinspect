@@ -1,5 +1,5 @@
 [project]
-name = "profecy"
+name = "profinspect"
 version = "0.1.0"
 description = "Tool to visualize profiling data -- a UI for gprof2dot"
 readme = "README.md"
@@ -9,7 +9,7 @@ dependencies = [
 ]
 
 [project.scripts]
-profecy = "profecy.cli:main"
+profinspect = "profinspect.cli:main"
 
 [build-system]
 requires = ["hatchling"]

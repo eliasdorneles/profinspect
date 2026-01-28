@@ -17,7 +17,7 @@ def find_free_port() -> int:
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="profecy",
+        prog="profinspect",
         description="Interactive profiling data visualizer (gprof2dot + Graphviz)",
     )
     parser.add_argument("file", nargs="?", default=None, help="Profile file to load on startup")

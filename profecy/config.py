@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-CONFIG_DIR = Path.home() / ".config" / "profecy"
+CONFIG_DIR = Path.home() / ".config" / "profinspect"
 CONFIG_FILE = CONFIG_DIR / "settings.json"
 
 DEFAULT_SETTINGS = {

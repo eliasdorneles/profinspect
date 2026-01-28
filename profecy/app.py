@@ -108,7 +108,7 @@ def create_app(initial_file: str | None = None) -> Flask:
             if uploaded_file:
                 # Save uploaded file to a temp location
                 suffix = os.path.splitext(filename)[1] or ""
-                fd, tmp_path = tempfile.mkstemp(suffix=suffix, prefix="profecy_")
+                fd, tmp_path = tempfile.mkstemp(suffix=suffix, prefix="profinspect_")
                 os.close(fd)
                 uploaded_file.save(tmp_path)
                 target_path = tmp_path
