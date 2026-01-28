@@ -78,9 +78,9 @@ shortcut `Ctrl+Enter`).
 - File picker (browse button) with auto-detected format
 - Format dropdown with auto-detect or manual override
 - Node and edge threshold sliders (prune low-impact nodes/edges)
+- Filters for functions called from/to
 - Colormap selection (color, bw, gray, pink, print)
-- Checkboxes: strip C++ names, wrap labels, color by self time, show samples
-- Advanced: root/leaf function filters, max depth, color skew, path filter
+- Advanced: max depth, color skew, path filter, strip C++ names, wrap labels, color by self time, show samples
 
 **Zoom controls:** buttons for zoom in/out, 1:1 reset, and fit-to-view. Mouse wheel zooms at cursor. Click-drag to pan. `Ctrl+Enter` triggers generation.
 

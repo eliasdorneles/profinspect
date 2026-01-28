@@ -30,6 +30,12 @@
             <label for="edge_threshold">Edge threshold: <span id="edge_threshold_val">{{ defaults.edge_threshold }}%</span></label>
             <input type="range" id="edge_threshold" name="edge_threshold" min="0" max="100" step="0.1" value="{{ defaults.edge_threshold }}">
 
+            <label for="root">Show calls from</label>
+            <input type="text" id="root" name="root" placeholder="function name">
+
+            <label for="leaf">Show calls to</label>
+            <input type="text" id="leaf" name="leaf" placeholder="function name">
+
             <label for="colormap">Colormap</label>
             <select id="colormap" name="colormap">
                 {% for cm in colormaps %}
@@ -37,21 +43,15 @@
                 {% endfor %}
             </select>
 
-            <fieldset>
-                <label><input type="checkbox" id="strip" name="strip" {% if defaults.strip %}checked{% endif %}> Strip C++ names</label>
-                <label><input type="checkbox" id="wrap" name="wrap" {% if defaults.wrap %}checked{% endif %}> Wrap labels</label>
-                <label><input type="checkbox" id="color_nodes_by_selftime" name="color_nodes_by_selftime" {% if defaults.color_nodes_by_selftime %}checked{% endif %}> Color by self time</label>
-                <label><input type="checkbox" id="show_samples" name="show_samples" {% if defaults.show_samples %}checked{% endif %}> Show samples</label>
-            </fieldset>
-
-            <label for="root">Show calls from</label>
-            <input type="text" id="root" name="root" placeholder="function name">
-
-            <label for="leaf">Show calls to</label>
-            <input type="text" id="leaf" name="leaf" placeholder="function name">
-
             <details class="advanced-options">
                 <summary>Advanced</summary>
+
+                <fieldset>
+                    <label><input type="checkbox" id="strip" name="strip" {% if defaults.strip %}checked{% endif %}> Strip C++ names</label>
+                    <label><input type="checkbox" id="wrap" name="wrap" {% if defaults.wrap %}checked{% endif %}> Wrap labels</label>
+                    <label><input type="checkbox" id="color_nodes_by_selftime" name="color_nodes_by_selftime" {% if defaults.color_nodes_by_selftime %}checked{% endif %}> Color by self time</label>
+                    <label><input type="checkbox" id="show_samples" name="show_samples" {% if defaults.show_samples %}checked{% endif %}> Show samples</label>
+                </fieldset>
 
                 <label for="depth">Max depth</label>
                 <input type="number" id="depth" name="depth" placeholder="e.g. 5" min="1">
