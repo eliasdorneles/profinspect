@@ -1,4 +1,4 @@
-"""Settings management for Profecy."""
+"""Settings management for Profinspect."""
 
 import json
 from pathlib import Path

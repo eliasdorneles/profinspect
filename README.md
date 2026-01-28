@@ -1,4 +1,4 @@
-# Profecy
+# Profinspect
 
 A local web app for visualizing profiling data. Wraps [gprof2dot](https://github.com/jrfonseca/gprof2dot) and Graphviz `dot` with an interactive browser UI featuring pan/zoom, configurable thresholds, and format selection.
 

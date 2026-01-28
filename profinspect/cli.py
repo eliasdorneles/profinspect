@@ -34,6 +34,6 @@ def main():
         # Open browser after a short delay to let the server start
         threading.Timer(0.5, webbrowser.open, args=[url]).start()
 
-    print(f"Profecy running at {url}")
+    print(f"Profinspect running at {url}")
     print("Press Ctrl+C to quit")
     app.run(host="127.0.0.1", port=port, debug=False)
