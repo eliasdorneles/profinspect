@@ -120,7 +120,7 @@ def generate_svg(file_path: str, options: dict, settings: dict | None = None) ->
 
 def _build_gprof2dot_command(file_path: str, options: dict, settings: dict) -> str:
     """Build the gprof2dot command string."""
-    cmd = settings.get("gprof2dot_command", "uvx gprof2dot")
+    cmd = settings.get("gprof2dot_command", "gprof2dot")
 
     parts = [cmd]
 
