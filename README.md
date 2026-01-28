@@ -6,7 +6,8 @@ A local web app for visualizing profiling data. Wraps [gprof2dot](https://github
 
 - Python 3.12+
 - [Graphviz](https://graphviz.org/) (`dot` command must be available)
-- [gprof2dot](https://github.com/jrfonseca/gprof2dot) (defaults to running via `uvx gprof2dot`)
+
+[gprof2dot](https://github.com/jrfonseca/gprof2dot) is included as a Python dependency and installed automatically.
 
 ## Installation
 
