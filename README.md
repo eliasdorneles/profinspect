@@ -51,9 +51,9 @@ python -m profinspect output.pstats
 
 ## Supported Profile Formats
 
-prof, pstats, callgrind, perf, collapse, axe, dtrace, hprof, json, sleepy, sysprof, xperf
+All formats supported by gprof2dot: prof, pstats, callgrind, perf, collapse, axe, dtrace, hprof, json, sleepy, sysprof, xperf
 
-The format is auto-detected from the file extension when possible (e.g. `.pstats`, `.prof`, `callgrind.out.*`). If it cannot be inferred, the configured default is used. You can always override the format manually in the dropdown.
+The format is auto-detected from the file extension when possible (e.g. `.pstats`, `.prof`, `callgrind.out.*`), otherwise, you can override the format manually in the dropdown.
 
 These correspond to the formats supported by gprof2dot. Common examples:
 
@@ -67,9 +67,14 @@ These correspond to the formats supported by gprof2dot. Common examples:
 
 ## UI Overview
 
-The main view has a collapsible sidebar with options and a pannable/zoomable SVG display area.
+The main view has a collapsible sidebar with options and a pannable/zoomable display area for the SVG graph view.
+
+The graph view updates automatically as you change parameters. You can disable
+this if you prefer to control the updates with the "Generate" button (or use
+shortcut `Ctrl+Enter`).
 
 **Sidebar options:**
+
 - File picker (browse button) with auto-detected format
 - Format dropdown with auto-detect or manual override
 - Node and edge threshold sliders (prune low-impact nodes/edges)
@@ -86,6 +91,6 @@ The main view has a collapsible sidebar with options and a pannable/zoomable SVG
 Accessible from the Settings tab in the UI. Persisted to `~/.config/profinspect/settings.json`.
 
 Configurable values:
-- `gprof2dot_command` -- command to run gprof2dot (default: `uvx gprof2dot`)
-- `dot_command` -- command to run Graphviz dot (default: `dot`)
-- Default values for all generation options (format, thresholds, colormap, etc.)
+- command to run gprof2dot (default: `gprof2dot`, you can use `uvx gprof2dot`)
+- command to run Graphviz dot (default: `dot`)
+- Default values for all generation options (thresholds, colormap, etc.)
