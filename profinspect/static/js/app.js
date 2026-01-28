@@ -22,6 +22,45 @@
     // The File object selected by the user (null when using CLI-provided path)
     var selectedFile = null;
 
+    // --- Auto-update ---
+    var autoUpdateCheckbox = document.getElementById("auto_update");
+    var autoUpdateTimer = null;
+    var DEBOUNCE_MS = 400;
+
+    function isAutoUpdate() {
+        return autoUpdateCheckbox.checked;
+    }
+
+    function applyAutoUpdateUI() {
+        generateBtn.style.display = isAutoUpdate() ? "none" : "";
+        try { localStorage.setItem("profinspect_auto_update", isAutoUpdate() ? "1" : "0"); } catch (_) {}
+    }
+
+    // Restore preference from localStorage
+    (function () {
+        try {
+            var saved = localStorage.getItem("profinspect_auto_update");
+            if (saved === "0") autoUpdateCheckbox.checked = false;
+        } catch (_) {}
+        applyAutoUpdateUI();
+    })();
+
+    autoUpdateCheckbox.addEventListener("change", function () {
+        applyAutoUpdateUI();
+        scheduleGenerate();
+    });
+
+    function scheduleGenerate() {
+        if (!isAutoUpdate()) return;
+        if (!hasFile()) return;
+        if (isGenerating) {
+            pendingGenerate = true;
+            return;
+        }
+        clearTimeout(autoUpdateTimer);
+        autoUpdateTimer = setTimeout(doGenerate, DEBOUNCE_MS);
+    }
+
     // --- Format inference ---
     var FORMAT_EXTENSIONS = {
         ".pstats": "pstats",
@@ -72,6 +111,7 @@
                     setStatus("Detected format: " + inferred, "success");
                 }
             }
+            scheduleGenerate();
         }
     });
 
@@ -200,11 +240,27 @@
     // --- Slider display ---
     nodeThreshold.addEventListener("input", function () {
         nodeThresholdVal.textContent = this.value + "%";
+        scheduleGenerate();
     });
 
     edgeThreshold.addEventListener("input", function () {
         edgeThresholdVal.textContent = this.value + "%";
+        scheduleGenerate();
     });
+
+    // --- Auto-update triggers on other controls ---
+    formatSelect.addEventListener("change", scheduleGenerate);
+    document.getElementById("colormap").addEventListener("change", scheduleGenerate);
+    document.getElementById("strip").addEventListener("change", scheduleGenerate);
+    document.getElementById("wrap").addEventListener("change", scheduleGenerate);
+    document.getElementById("color_nodes_by_selftime").addEventListener("change", scheduleGenerate);
+    document.getElementById("show_samples").addEventListener("change", scheduleGenerate);
+    // Text/number inputs: trigger on change (blur) to avoid firing on every keystroke
+    document.getElementById("root").addEventListener("change", scheduleGenerate);
+    document.getElementById("leaf").addEventListener("change", scheduleGenerate);
+    document.getElementById("depth").addEventListener("change", scheduleGenerate);
+    document.getElementById("skew").addEventListener("change", scheduleGenerate);
+    document.getElementById("path_filter").addEventListener("change", scheduleGenerate);
 
     // --- Status bar helpers ---
     function setStatus(msg, type) {
@@ -213,6 +269,9 @@
     }
 
     // --- Generate ---
+    var isGenerating = false;
+    var pendingGenerate = false;
+
     function hasFile() {
         return selectedFile || filePathInput.value.trim();
     }
@@ -248,6 +307,8 @@
             setStatus("Please select a profile file.", "error");
             return;
         }
+        if (isGenerating) return;
+        isGenerating = true;
 
         setStatus("Generating...", "");
         generateBtn.disabled = true;
@@ -310,8 +371,13 @@
         } catch (e) {
             setStatus("Request failed: " + e.message, "error");
         } finally {
+            isGenerating = false;
             generateBtn.disabled = false;
             generateBtn.textContent = "Generate";
+            if (pendingGenerate) {
+                pendingGenerate = false;
+                scheduleGenerate();
+            }
         }
     }
 

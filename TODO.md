@@ -2,8 +2,7 @@
 
 - [ ] consider making gprof2dot a dependency, and therefore no need to configure path to run it
 
-- [ ] make the update more dynamic: instead of requiring user to click
-    "Generate", do it automatically whenever a parameter is changed
+- [x] make the update more dynamic: instead of requiring user to click "Generate", do it automatically whenever a parameter is changed
 
 - [ ] build a suite of tests
 
